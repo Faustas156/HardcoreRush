@@ -55,6 +55,7 @@ namespace Hardcore
             }
             else
             {
+                Main.Game.OnLevelLoadComplete -= () =>
                 RM.ui.SetRecordMode(false);
                 GS.recordMode = false;
             }
