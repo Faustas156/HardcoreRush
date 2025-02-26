@@ -23,4 +23,4 @@ using System.Runtime.InteropServices;
 // [assembly: AssemblyVersion("1.0.*")]
 [assembly: AssemblyVersion("1.0.0.0")]
 [assembly: AssemblyFileVersion("1.0.0.0")]
-[assembly: MelonInfo(typeof(Hardcore.Main), "Hardcore Hell Rush", "1.0.0", "Faustas")]
+[assembly: MelonInfo(typeof(Hardcore.Main), "Hardcore Hell Rush", "1.0.1", "Faustas")]

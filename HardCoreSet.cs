@@ -24,18 +24,18 @@ namespace Hardcore
 
         //static readonly MethodInfo ogshflbt = AccessTools.Method(typeof(MenuScreenLevelRush), "OnSetVisible");
         //static readonly MethodInfo oglvlrshscr = AccessTools.Method(typeof(MenuScreenLevelRushComplete), "OnSetVisible");
-        static void OnLevelLoad(LevelData _)
+        static void OnLevelLoad(LevelData level)
         {
-            if (!LevelRush.IsHellRush() || SceneManager.GetActiveScene().name == "Menu") return;
+            if (!level || level.type == LevelData.LevelType.Hub || level.type == LevelData.LevelType.None) return;
 
-            RM.mechController.currentHealth = 1;
-            RM.mechController.maxHealth = 1;
-
-
-            Singleton<Game>.Instance.GetGameData().GetCard("KATANA");
 
             RM.ui.SetRecordMode(LevelRush.IsHellRush());
             GS.recordMode = LevelRush.IsHellRush();
+
+            if (!LevelRush.IsLevelRush()) return;
+
+            RM.mechController.currentHealth = 1;
+            RM.mechController.maxHealth = 1;
         }
 
         static void Activate(bool activate)
@@ -53,7 +53,7 @@ namespace Hardcore
                         GS.AddCard("KATANA");
                     };
             }
-            else if (!activate)
+            else
             {
                 return;
             }
