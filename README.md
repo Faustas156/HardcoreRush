@@ -12,4 +12,4 @@ Hardcore Hell Rush is a brutally difficult Hell Rush mod that aims to push playe
 
 Credits:
 
-@stxticOVRL for all the troubleshooting and modding help!!
+@stxticOVFL for all the troubleshooting and modding help!!
