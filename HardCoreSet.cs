@@ -55,7 +55,8 @@ namespace Hardcore
             }
             else
             {
-                return;
+                RM.ui.SetRecordMode(false);
+                GS.recordMode = false;
             }
         }
         //static void AddShuffleButton(MainMenu __instance) 
