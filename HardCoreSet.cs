@@ -1,6 +1,7 @@
 ﻿using HarmonyLib;
 using NeonLite;
 using NeonLite.Modules;
+using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -23,7 +24,8 @@ namespace Hardcore
         }
 
         //static readonly MethodInfo ogshflbt = AccessTools.Method(typeof(MenuScreenLevelRush), "OnSetVisible");
-        //static readonly MethodInfo oglvlrshscr = AccessTools.Method(typeof(MenuScreenLevelRushComplete), "OnSetVisible");
+        static readonly MethodInfo oglvlrshscr = AccessTools.Method(typeof(MenuScreenLevelRushComplete), "OnSetVisible");
+        static readonly MethodInfo ogaddcard = AccessTools.Method(typeof(PlayerCardDeck), "Initialize");
         static void OnLevelLoad(LevelData level)
         {
             if (!level || level.type == LevelData.LevelType.Hub || level.type == LevelData.LevelType.None) return;
@@ -43,19 +45,16 @@ namespace Hardcore
             active = activate;
 
             //NeonLite.Patching.AddPatch(ogshflbt, AddShuffleButton, NeonLite.Patching.PatchTarget.Postfix);
-            //NeonLite.Patching.AddPatch(oglvlrshscr, DisplayFailText, NeonLite.Patching.PatchTarget.Postfix);
 
             if (activate)
             {
-                Main.Game.OnLevelLoadComplete += () =>
-                    {
-                        if (!LevelRush.IsHellRush()) return;
-                        GS.AddCard("KATANA");
-                    };
+                if (!LevelRush.IsHellRush()) return;
+                Patching.AddPatch(oglvlrshscr, DisplayHardcoreText, Patching.PatchTarget.Postfix);
+                Patching.AddPatch(ogaddcard, OnLevelLoadComplete, Patching.PatchTarget.Postfix);
             }
             else
             {
-                Main.Game.OnLevelLoadComplete -= () =>
+                Patching.RemovePatch(ogaddcard, OnLevelLoadComplete);
                 RM.ui.SetRecordMode(false);
                 GS.recordMode = false;
             }
@@ -68,9 +67,40 @@ namespace Hardcore
         //        var parent = rushScreen.shuffleToggle.transform.parent;
         //    }
         //}
-        //static void DisplayFailText(ref MenuScreenLevelRushComplete __instance) 
-        //{
-        //    __instance.timeText.
-        //}
+        static void DisplayHardcoreText(ref MenuScreenLevelRushComplete __instance)
+        {
+            if (LevelRush.IsHellRush() && active)
+            {
+                string text = LevelRush.GetCurrentLevelRushType() switch
+                {
+                    LevelRush.LevelRushType.WhiteRush => "White's Hardcore",
+                    LevelRush.LevelRushType.MikeyRush => "Mikey's Hardcore",
+                    LevelRush.LevelRushType.VioletRush => "Violet's Hardcore",
+                    LevelRush.LevelRushType.RedRush => "Red's Hardcore",
+                    LevelRush.LevelRushType.YellowRush => "Yellow's Hardcore",
+                    _ => "Error"
+                };
+
+                if (text == "Error") return;
+
+                text += " Hell Rush";
+
+                __instance._rushName.textMeshProUGUI.text = text;
+            }
+        }
+
+        static void OnLevelLoadComplete()
+        {
+            GS.AddCard("KATANA");
+        }
     }
 }
+
+//static void ForceCard(PlayerCardDeck __instance)
+//{
+
+//Main.Game.OnLevelLoadComplete += () =>
+//{
+//    PlayerCard playerCard = new PlayerCard();
+//    playerCard.data = Singleton<Game>.Instance.GetGameData().GetCard("KATANA");
+//};
