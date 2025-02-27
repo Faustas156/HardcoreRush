@@ -1,7 +1,6 @@
 ﻿using HarmonyLib;
 using NeonLite;
 using NeonLite.Modules;
-using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -25,7 +24,7 @@ namespace Hardcore
 
         //static readonly MethodInfo ogshflbt = AccessTools.Method(typeof(MenuScreenLevelRush), "OnSetVisible");
         static readonly MethodInfo oglvlrshscr = AccessTools.Method(typeof(MenuScreenLevelRushComplete), "OnSetVisible");
-        static readonly MethodInfo ogaddcard = AccessTools.Method(typeof(PlayerCardDeck), "Initialize");
+        //static readonly MethodInfo oggscard = AccessTools.Method(typeof(GS), "AddCard");
         static void OnLevelLoad(LevelData level)
         {
             if (!level || level.type == LevelData.LevelType.Hub || level.type == LevelData.LevelType.None) return;
@@ -45,16 +44,23 @@ namespace Hardcore
             active = activate;
 
             //NeonLite.Patching.AddPatch(ogshflbt, AddShuffleButton, NeonLite.Patching.PatchTarget.Postfix);
+            Patching.AddPatch(oglvlrshscr, DisplayHardcoreText, Patching.PatchTarget.Postfix);
+            //Patching.AddPatch(oggscard, ForceCard, Patching.PatchTarget.Postfix);
 
             if (activate)
             {
-                if (!LevelRush.IsHellRush()) return;
-                Patching.AddPatch(oglvlrshscr, DisplayHardcoreText, Patching.PatchTarget.Postfix);
-                Patching.AddPatch(ogaddcard, OnLevelLoadComplete, Patching.PatchTarget.Postfix);
+                Main.Game.OnLevelLoadComplete += () =>
+                    {
+                        if (!LevelRush.IsHellRush()) return;
+                        GS.AddCard("KATANA");
+                    };
             }
             else
             {
-                Patching.RemovePatch(ogaddcard, OnLevelLoadComplete);
+                Main.Game.OnLevelLoadComplete -= () =>
+                {
+                    GS.AddCard("KATANA");
+                };
                 RM.ui.SetRecordMode(false);
                 GS.recordMode = false;
             }
@@ -87,20 +93,10 @@ namespace Hardcore
 
                 __instance._rushName.textMeshProUGUI.text = text;
             }
-        }
+            else
+            {
 
-        static void OnLevelLoadComplete()
-        {
-            GS.AddCard("KATANA");
+            }
         }
     }
 }
-
-//static void ForceCard(PlayerCardDeck __instance)
-//{
-
-//Main.Game.OnLevelLoadComplete += () =>
-//{
-//    PlayerCard playerCard = new PlayerCard();
-//    playerCard.data = Singleton<Game>.Instance.GetGameData().GetCard("KATANA");
-//};
